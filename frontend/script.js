@@ -1,35 +1,85 @@
 const api = "/api/workouts";
 const authApi = "/auth";
 
-const loginPage = document.getElementById("loginPage");
-const mainPage = document.getElementById("mainPage");
-const authForm = document.getElementById("authForm");
-const exerciseForm = document.getElementById("exerciseForm");
-const table = document.getElementById("table");
-const userEmailSpan = document.getElementById("userEmail");
-const noDataMsg = document.getElementById("noDataMsg");
+// Store element references (populated after DOM ready)
+let loginPage, mainPage, authForm, exerciseForm, table, userEmailSpan, noDataMsg;
+let authEmailInput, authPasswordInput, loginBtn, signupBtn, logoutBtn;
+let authError, formError;
 
-const authEmailInput = document.getElementById("authEmail");
-const authPasswordInput = document.getElementById("authPassword");
-const loginBtn = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
-const logoutBtn = document.getElementById("logoutBtn");
+// Initialize all event listeners and DOM references
+function initializeApp() {
+  // Get DOM elements
+  loginPage = document.getElementById("loginPage");
+  mainPage = document.getElementById("mainPage");
+  authForm = document.getElementById("authForm");
+  exerciseForm = document.getElementById("exerciseForm");
+  table = document.getElementById("table");
+  userEmailSpan = document.getElementById("userEmail");
+  noDataMsg = document.getElementById("noDataMsg");
 
-const authError = document.getElementById("authError");
-const formError = document.getElementById("formError");
+  authEmailInput = document.getElementById("authEmail");
+  authPasswordInput = document.getElementById("authPassword");
+  loginBtn = document.getElementById("loginBtn");
+  signupBtn = document.getElementById("signupBtn");
+  logoutBtn = document.getElementById("logoutBtn");
 
-// Set today's date as default
-document.getElementById("date").valueAsDate = new Date();
+  authError = document.getElementById("authError");
+  formError = document.getElementById("formError");
+
+  // Debug: Log if any elements are missing
+  console.log("DOM Elements check:", {
+    loginPage: !!loginPage,
+    mainPage: !!mainPage,
+    table: !!table,
+    loginBtn: !!loginBtn,
+    signupBtn: !!signupBtn,
+    logoutBtn: !!logoutBtn
+  });
+
+  // Setup event listeners
+  setupEventListeners();
+  
+  // Check authentication status
+  console.log("Starting auth check...");
+  checkAuthStatus();
+}
+
+function setupEventListeners() {
+  if (!loginBtn) return;
+  
+  // Login handler
+  loginBtn.addEventListener("click", handleLogin);
+  
+  // Signup handler
+  signupBtn.addEventListener("click", handleSignup);
+  
+  // Logout handler
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout);
+  }
+  
+  // Form submit handler
+  if (exerciseForm) {
+    exerciseForm.addEventListener("submit", handleFormSubmit);
+  }
+}
 
 // Check authentication status on page load
 async function checkAuthStatus() {
   try {
-    const res = await fetch(`${authApi}/status`);
-    const data = await res.json();
+    const res = await fetch(`${authApi}/status`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
     
-    if (data.authenticated) {
-      showMainPage(data.email);
-      load();
+    if (res.ok) {
+      const data = await res.json();
+      if (data.authenticated) {
+        showMainPage(data.email);
+        load();
+      } else {
+        showLoginPage();
+      }
     } else {
       showLoginPage();
     }
@@ -49,6 +99,8 @@ function showMainPage(email) {
   loginPage.classList.add("d-none");
   mainPage.classList.remove("d-none");
   userEmailSpan.textContent = `Logged in as: ${email}`;
+  // Set today's date as default when showing form
+  document.getElementById("date").valueAsDate = new Date();
 }
 
 function clearAuthForm() {
@@ -59,7 +111,7 @@ function clearAuthForm() {
 }
 
 // Login handler
-loginBtn.addEventListener("click", async () => {
+async function handleLogin() {
   const email = authEmailInput.value.trim();
   const password = authPasswordInput.value;
   
@@ -88,10 +140,10 @@ loginBtn.addEventListener("click", async () => {
     console.error("Login error:", err);
     showAuthError("An error occurred. Please try again.");
   }
-});
+}
 
 // Signup handler
-signupBtn.addEventListener("click", async () => {
+async function handleSignup() {
   const email = authEmailInput.value.trim();
   const password = authPasswordInput.value;
   
@@ -137,10 +189,10 @@ signupBtn.addEventListener("click", async () => {
     console.error("Signup error:", err);
     showAuthError("An error occurred. Please try again.");
   }
-});
+}
 
 // Logout handler
-logoutBtn.addEventListener("click", async () => {
+async function handleLogout() {
   try {
     await fetch(`${authApi}/logout`, { method: "POST" });
     showLoginPage();
@@ -149,7 +201,62 @@ logoutBtn.addEventListener("click", async () => {
     console.error("Logout error:", err);
     alert("Error logging out");
   }
-});
+}
+
+// Form submit handler
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  hideFormError();
+  
+  const workoutData = {
+    exercise: document.getElementById("exercise").value.trim(),
+    muscleGroup: document.getElementById("muscleGroup").value,
+    duration: parseInt(document.getElementById("duration").value),
+    calories: parseInt(document.getElementById("calories").value),
+    intensity: document.getElementById("intensity").value,
+    date: document.getElementById("date").value,
+    notes: document.getElementById("notes").value.trim()
+  };
+  
+  // Basic validation
+  if (!workoutData.exercise || !workoutData.muscleGroup || !workoutData.intensity) {
+    showFormError("Please fill in all required fields");
+    return;
+  }
+  
+  if (isNaN(workoutData.duration) || workoutData.duration <= 0) {
+    showFormError("Duration must be a positive number");
+    return;
+  }
+  
+  if (isNaN(workoutData.calories) || workoutData.calories < 0) {
+    showFormError("Calories must be a non-negative number");
+    return;
+  }
+  
+  try {
+    const res = await fetch(api, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(workoutData)
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      showFormError(data.message || "Error creating workout");
+      return;
+    }
+    
+    exerciseForm.reset();
+    document.getElementById("date").valueAsDate = new Date();
+    hideFormError();
+    load();
+  } catch (err) {
+    console.error("Error creating workout:", err);
+    showFormError("An error occurred. Please try again.");
+  }
+}
 
 function showAuthError(message) {
   authError.textContent = message;
@@ -217,60 +324,6 @@ function getIntensityColor(intensity) {
 }
 
 // Add/Create workout
-exerciseForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  hideFormError();
-  
-  const workoutData = {
-    exercise: document.getElementById("exercise").value.trim(),
-    muscleGroup: document.getElementById("muscleGroup").value,
-    duration: parseInt(document.getElementById("duration").value),
-    calories: parseInt(document.getElementById("calories").value),
-    intensity: document.getElementById("intensity").value,
-    date: document.getElementById("date").value,
-    notes: document.getElementById("notes").value.trim()
-  };
-  
-  // Basic validation
-  if (!workoutData.exercise || !workoutData.muscleGroup || !workoutData.intensity) {
-    showFormError("Please fill in all required fields");
-    return;
-  }
-  
-  if (isNaN(workoutData.duration) || workoutData.duration <= 0) {
-    showFormError("Duration must be a positive number");
-    return;
-  }
-  
-  if (isNaN(workoutData.calories) || workoutData.calories < 0) {
-    showFormError("Calories must be a non-negative number");
-    return;
-  }
-  
-  try {
-    const res = await fetch(api, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(workoutData)
-    });
-    
-    const data = await res.json();
-    
-    if (!res.ok) {
-      showFormError(data.message || "Error creating workout");
-      return;
-    }
-    
-    exerciseForm.reset();
-    document.getElementById("date").valueAsDate = new Date();
-    hideFormError();
-    load();
-  } catch (err) {
-    console.error("Error creating workout:", err);
-    showFormError("An error occurred. Please try again.");
-  }
-});
-
 // Edit workout
 async function editWorkout(id) {
   try {
@@ -392,5 +445,8 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Initialize app
-checkAuthStatus();
+// Initialize app when DOM is ready
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("DOM loaded, initializing app");
+  initializeApp();
+});
