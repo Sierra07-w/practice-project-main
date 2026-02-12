@@ -45,22 +45,32 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-  if (!loginBtn) return;
+  console.log("Setting up event listeners...");
+  console.log("loginBtn:", !!loginBtn, "signupBtn:", !!signupBtn, "logoutBtn:", !!logoutBtn);
+  
+  if (!loginBtn || !signupBtn) {
+    console.error("Login or Signup buttons not found!");
+    return;
+  }
   
   // Login handler
   loginBtn.addEventListener("click", handleLogin);
+  console.log("Login listener attached");
   
   // Signup handler
   signupBtn.addEventListener("click", handleSignup);
+  console.log("Signup listener attached");
   
   // Logout handler
   if (logoutBtn) {
     logoutBtn.addEventListener("click", handleLogout);
+    console.log("Logout listener attached");
   }
   
   // Form submit handler
   if (exerciseForm) {
     exerciseForm.addEventListener("submit", handleFormSubmit);
+    console.log("Form listener attached");
   }
 }
 
@@ -69,7 +79,8 @@ async function checkAuthStatus() {
   try {
     const res = await fetch(`${authApi}/status`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      credentials: "include"
     });
     
     if (res.ok) {
@@ -90,50 +101,81 @@ async function checkAuthStatus() {
 }
 
 function showLoginPage() {
-  loginPage.classList.remove("d-none");
-  mainPage.classList.add("d-none");
+  console.log("Showing login page");
+  if (loginPage) {
+    loginPage.classList.remove("d-none");
+    loginPage.style.display = "block";
+  }
+  if (mainPage) {
+    mainPage.classList.add("d-none");
+    mainPage.style.display = "none";
+  }
   clearAuthForm();
+  console.log("Login page should be visible now");
 }
 
 function showMainPage(email) {
-  loginPage.classList.add("d-none");
-  mainPage.classList.remove("d-none");
-  userEmailSpan.textContent = `Logged in as: ${email}`;
+  console.log("Showing main page for:", email);
+  if (loginPage) {
+    loginPage.classList.add("d-none");
+    loginPage.style.display = "none";
+  }
+  if (mainPage) {
+    mainPage.classList.remove("d-none");
+    mainPage.style.display = "block";
+  }
+  if (userEmailSpan) {
+    userEmailSpan.textContent = `Logged in as: ${email}`;
+  }
   // Set today's date as default when showing form
-  document.getElementById("date").valueAsDate = new Date();
+  const dateInput = document.getElementById("date");
+  if (dateInput) {
+    dateInput.valueAsDate = new Date();
+  }
+  console.log("Main page should be visible now");
 }
 
 function clearAuthForm() {
-  authEmailInput.value = "";
-  authPasswordInput.value = "";
-  authError.classList.add("d-none");
-  authError.textContent = "";
+  if (authEmailInput) authEmailInput.value = "";
+  if (authPasswordInput) authPasswordInput.value = "";
+  if (authError) {
+    authError.classList.add("d-none");
+    authError.textContent = "";
+  }
 }
 
 // Login handler
 async function handleLogin() {
+  console.log("Login button clicked");
   const email = authEmailInput.value.trim();
   const password = authPasswordInput.value;
   
+  console.log("Login attempt with email:", email);
+  
   if (!email || !password) {
+    console.log("Missing email or password");
     showAuthError("Please enter email and password");
     return;
   }
   
   try {
+    console.log("Sending login request...");
     const res = await fetch(`${authApi}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
+      credentials: "include"
     });
     
     const data = await res.json();
+    console.log("Login response:", res.status, data);
     
     if (!res.ok) {
       showAuthError(data.message || "Login failed");
       return;
     }
     
+    console.log("Login successful, showing main page");
     showMainPage(email);
     load();
   } catch (err) {
@@ -144,8 +186,11 @@ async function handleLogin() {
 
 // Signup handler
 async function handleSignup() {
+  console.log("Signup button clicked");
   const email = authEmailInput.value.trim();
   const password = authPasswordInput.value;
+  
+  console.log("Signup attempt with email:", email);
   
   if (!email || !password) {
     showAuthError("Please enter email and password");
@@ -158,30 +203,42 @@ async function handleSignup() {
   }
   
   try {
+    console.log("Sending signup request...");
     const res = await fetch(`${authApi}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
+      credentials: "include"
     });
     
     const data = await res.json();
+    console.log("Signup response:", res.status, data);
     
     if (!res.ok) {
       showAuthError(data.message || "Signup failed");
       return;
     }
     
-    // After successful signup, auto-login
-    showAuthError("");
-    authError.classList.add("d-none");
+    console.log("Signup successful, attempting auto-login...");
     
+    // After successful signup, auto-login
     const loginRes = await fetch(`${authApi}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
+      credentials: "include"
     });
     
+    const loginData = await loginRes.json();
+    console.log("Auto-login response:", loginRes.status, loginData);
+    
     if (loginRes.ok) {
+      console.log("Auto-login successful");
+      showMainPage(email);
+      load();
+    } else {
+      console.log("Auto-login failed, showing main page anyway");
+      showAuthError("");
       showMainPage(email);
       load();
     }
@@ -194,7 +251,7 @@ async function handleSignup() {
 // Logout handler
 async function handleLogout() {
   try {
-    await fetch(`${authApi}/logout`, { method: "POST" });
+    await fetch(`${authApi}/logout`, { method: "POST", credentials: "include" });
     showLoginPage();
     location.reload();
   } catch (err) {
@@ -238,7 +295,8 @@ async function handleFormSubmit(e) {
     const res = await fetch(api, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(workoutData)
+      body: JSON.stringify(workoutData),
+      credentials: "include"
     });
     
     const data = await res.json();
@@ -259,24 +317,35 @@ async function handleFormSubmit(e) {
 }
 
 function showAuthError(message) {
-  authError.textContent = message;
-  authError.classList.remove("d-none");
+  console.log("Showing auth error:", message);
+  if (authError) {
+    authError.textContent = message;
+    authError.classList.remove("d-none");
+  } else {
+    console.error("authError element not found!");
+    alert(message);
+  }
 }
 
 function showFormError(message) {
-  formError.textContent = message;
-  formError.classList.remove("d-none");
+  console.log("Showing form error:", message);
+  if (formError) {
+    formError.textContent = message;
+    formError.classList.remove("d-none");
+  }
 }
 
 function hideFormError() {
-  formError.classList.add("d-none");
-  formError.textContent = "";
+  if (formError) {
+    formError.classList.add("d-none");
+    formError.textContent = "";
+  }
 }
 
 // Load and display workouts
 async function load() {
   try {
-    const res = await fetch(api);
+    const res = await fetch(api, { credentials: "include" });
     const data = await res.json();
     
     table.innerHTML = "";
@@ -327,7 +396,7 @@ function getIntensityColor(intensity) {
 // Edit workout
 async function editWorkout(id) {
   try {
-    const res = await fetch(`${api}/${id}`);
+    const res = await fetch(`${api}/${id}`, { credentials: "include" });
     const workout = await res.json();
     
     // Populate form with current values
@@ -373,7 +442,8 @@ async function editWorkout(id) {
         const updateRes = await fetch(`${api}/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData)
+          body: JSON.stringify(updatedData),
+          credentials: "include"
         });
         
         const updateData = await updateRes.json();
@@ -419,7 +489,7 @@ async function deleteWorkout(id) {
   }
   
   try {
-    const res = await fetch(`${api}/${id}`, { method: "DELETE" });
+    const res = await fetch(`${api}/${id}`, { method: "DELETE", credentials: "include" });
     
     if (!res.ok) {
       showFormError("Error deleting workout");
@@ -444,6 +514,37 @@ function escapeHtml(text) {
   };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
+
+// Test function for debugging
+window.testLogin = async function() {
+  console.log("=== TEST LOGIN ===");
+  console.log("Email input:", authEmailInput);
+  console.log("Password input:", authPasswordInput);
+  console.log("Login button:", loginBtn);
+  console.log("Auth error element:", authError);
+  console.log("Main page element:", mainPage);
+  console.log("Login page element:", loginPage);
+  
+  if (authEmailInput) authEmailInput.value = "demo@test.com";
+  if (authPasswordInput) authPasswordInput.value = "demo123456";
+  
+  console.log("Calling handleLogin...");
+  await handleLogin();
+  console.log("handleLogin completed");
+};
+
+// Test function to check page visibility
+window.testVisibility = function() {
+  console.log("=== VISIBILITY TEST ===");
+  if (loginPage) {
+    console.log("Login page classList:", Array.from(loginPage.classList));
+    console.log("Login page display:", getComputedStyle(loginPage).display);
+  }
+  if (mainPage) {
+    console.log("Main page classList:", Array.from(mainPage.classList));
+    console.log("Main page display:", getComputedStyle(mainPage).display);
+  }
+};
 
 // Initialize app when DOM is ready
 document.addEventListener("DOMContentLoaded", function() {
