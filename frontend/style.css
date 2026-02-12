@@ -1,0 +1,345 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+#loginPage {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loginPage .card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#loginPage h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#loginPage h5 {
+  color: #667eea;
+  font-weight: 600;
+}
+
+#loginPage input,
+#loginPage button {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+#loginPage input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+#loginPage .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  font-weight: 600;
+  padding: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#loginPage .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+#loginPage .btn-secondary {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  color: #667eea;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#loginPage .btn-secondary:hover {
+  background-color: #e8e8e8;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+#mainPage {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+#mainPage .navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#mainPage .navbar-brand {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+#mainPage h2 {
+  color: white;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+#mainPage .container {
+  max-width: 1200px;
+}
+
+#mainPage .card {
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: slideInUp 0.5s ease-out;
+}
+
+#mainPage label {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+#mainPage .form-control,
+#mainPage .form-select {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  transition: all 0.3s ease;
+}
+
+#mainPage .form-control:focus,
+#mainPage .form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+#mainPage .btn-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#mainPage .btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(17, 153, 142, 0.3);
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+#mainPage .btn-warning {
+  background: #ff9500;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+#mainPage .btn-warning:hover {
+  background: #ff8a00;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 149, 0, 0.3);
+}
+
+#mainPage .btn-primary {
+  background: #3498db;
+  border: none;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+#mainPage .btn-primary:hover {
+  background: #2980b9;
+}
+
+#mainPage .btn-danger {
+  background: #e74c3c;
+  border: none;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+#mainPage .btn-danger:hover {
+  background: #c0392b;
+}
+
+#mainPage .table {
+  background: white;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#mainPage .table-dark {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+#mainPage .table th {
+  font-weight: 700;
+  padding: 1.2rem;
+  border: none;
+  color: white;
+}
+
+#mainPage .table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+#mainPage .table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+#mainPage .table tbody tr:hover {
+  background-color: #f8f9ff;
+}
+
+#mainPage .table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+#mainPage .badge {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+#mainPage .badge.bg-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+#mainPage .badge.bg-warning {
+  background: #f39c12;
+}
+
+#mainPage .badge.bg-danger {
+  background: #e74c3c;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  animation: slideInDown 0.3s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+#userEmail {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+#logoutBtn {
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#logoutBtn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+.table-responsive {
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #loginPage .card {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  #mainPage .table {
+    font-size: 0.9rem;
+  }
+
+  #mainPage .table th,
+  #mainPage .table td {
+    padding: 0.7rem;
+  }
+
+  #mainPage .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  #mainPage h2 {
+    font-size: 1.5rem;
+  }
+
+  #loginPage h1 {
+    font-size: 2rem;
+  }
+}
+
